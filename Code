@@ -1,0 +1,34 @@
+import numpy as np
+import cv2
+import smtplib
+import time
+
+
+fire_cascade = cv2.CascadeClassifier("Location of your object xml file with \\ separating each directory instead of \")
+
+cap = cv2.VideoCapture(0)
+while True:
+    ret, img = cap.read()
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    fire = fire_cascade.detectMultiScale(gray, 1.2, 5)
+    for (x,y,w,h) in fire:
+        cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+        roi_gray = gray[y:y+h, x:x+w]
+        roi_color = img[y:y+h, x:x+w]
+        print('Object is Detected! Notification sent!')
+        content='Object is detected..!'
+        mail=smtplib.SMTP('smtp.gmail.com',587)
+        mail.ehlo()
+        mail.starttls()
+        mail.login('Here enter your senders email-id','Here enter your senders password')
+        mail.sendmail('Here enter your senders email-id','Here enter your receiver email-id',content)
+        mail.close()
+        time.sleep(0.2)
+        
+    cv2.imshow('img',img)
+    k = cv2.waitKey(1) 
+    if k == ord('s'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
